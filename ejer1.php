@@ -1,22 +1,43 @@
 <?php
-$duendes = array(1000, 2000, 3000, "", 4000, "", 5000, 6000, "", 7000, 8000, 9000, "", 10000);
 
-$totalCalorias = 0; // Variable para acumular las calorías
-$maxCalorias = 0;   // Variable para el máximo encontrado
-$maxPosition = 0;   // Variable para la posición del máximo
+// Ruta al archivo de texto
+$archivo = './RETOVICENTE/c1.csv';
 
-for ($i = 0; $i < count($duendes); $i++) {
-    $calorias = $duendes[$i];
+// Inicializa un arreglo para almacenar las sumas
+$sumas = [];
 
-    if ($calorias !== "") {
-        $totalCalorias += $calorias; // Suma las calorías no vacías
-    } else {
-        if ($totalCalorias > $maxCalorias) {
-            $maxCalorias = $totalCalorias; // Actualiza el máximo si es mayor
-            $maxPosition = $i; // Almacena la posición del máximo
+// Abre el archivo para lectura
+$handle = fopen($archivo, 'r');
+
+if ($handle) {
+    $suma = 0; // Inicializa una variable para la suma actual
+    $lineas = file($archivo, FILE_IGNORE_NEW_LINES); // Lee el archivo y elimina saltos de línea
+
+    for ($i = 0; $i < count($lineas); $i++) {
+        $linea = $lineas[$i];
+        if (trim($linea) === '') {
+            $sumas[] = $suma;
+            $suma = 0; // Reinicia la suma
+        } else {
+            // Agrega el valor de la línea a la suma actual
+            $valor = intval(trim($linea));
+            $suma += $valor;
         }
-        $totalCalorias = 0; // Reinicia la suma de calorías
     }
+
+    // Agrega la última suma si no se encuentra en una línea en blanco al final del archivo
+    $sumas[] = $suma;
+
+    // Cierra el archivo
+    fclose($handle);
+    
+    // Encuentra la suma máxima y su posición
+    $maxSuma = max($sumas);
+    $maxPosition = array_search($maxSuma, $sumas);
+
+    echo "El duende que lleva más calorías tiene: $maxSuma calorías y se encuentra en la posición $maxPosition";
+} else {
+    echo "No se pudo abrir el archivo CSV.";
 }
 
-echo "El duende que lleva más calorías tiene: " . $maxCalorias . " y se encuentra en la posición " . $maxPosition;
+?>
